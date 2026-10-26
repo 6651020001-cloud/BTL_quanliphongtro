@@ -3,7 +3,7 @@
 //             Huynh Gia Bao 6651020002
 //             Phan Cong Binh 6651020003
 //             Luong Anh Dung 6651020006
-//             Tran Phat Dat 6651020017
+//             Tran Phat Dat 6651020016
 // De Tai: He Thong Quan Ly Phong Tro
 
 #include <iostream>
