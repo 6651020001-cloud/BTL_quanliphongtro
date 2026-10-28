@@ -1,5 +1,3 @@
-// ================= THONG KE =================
-
 void thongkeMenu()
 {
     int luaChon;
@@ -10,6 +8,7 @@ void thongkeMenu()
         cout << "1. Thong ke phong\n";
         cout << "2. Thong ke nguoi thue\n";
         cout << "3. Thong ke hoa don\n";
+        cout << "4. Danh sach hoa don chua thanh toan\n";
         cout << "0. Quay lai\n";
         cout << "====================================\n";
         cout << "Nhap lua chon: ";
@@ -25,6 +24,9 @@ void thongkeMenu()
                 break;
             case 3:
                 thongKeHoaDon();
+                break;
+            case 4:
+                thongKeChuaThanhToan();
                 break;
             case 0:
                 break;
