@@ -7,6 +7,7 @@ void hoadon()
         cout << "\n========== QUAN LY HOA DON ==========\n";
         cout << "1. Hien thi hoa don\n";
         cout << "2. Xuat hoa don\n";
+        cout << "3. Cap nhat thanh toan\n";
         cout << "0. Quay lai\n";
         cout << "=====================================\n";
         cout << "Nhap lua chon: ";
@@ -19,6 +20,9 @@ void hoadon()
                 break;
             case 2:
                 xuatHoaDon();
+                break;
+            case 3:
+                capNhatThanhToan();
                 break;
             case 0:
                 break;
