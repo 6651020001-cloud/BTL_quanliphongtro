@@ -8,6 +8,7 @@ void phongMenu()
         cout << "1. Them phong\n";
         cout << "2. Xoa phong\n";
         cout << "3. Hien thi danh sach phong\n";
+        cout << "4. Sua gia phong\n";
         cout << "0. Quay lai\n";
         cout << "===================================\n";
         cout << "Nhap lua chon: ";
@@ -23,6 +24,9 @@ void phongMenu()
                 break;
             case 3:
                 hienThiPhong();
+                break;
+            case 4:
+                suaPhong();
                 break;
             case 0:
                 break;
