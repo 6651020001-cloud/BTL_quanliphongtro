@@ -44,34 +44,51 @@ vector<Phong> danhSachPhong;
 vector<NguoiThue> danhSachNguoiThue;
 vector<HoaDon> danhSachHoaDon;
 
-// khai bao ham
+// ================= KHAI BAO HAM =================
+
+void xoaLoiNhap();
+int nhapSoNguyen();
+double nhapSoTien();
+void luuDuLieu();
+void docDuLieu();
+
 void phongMenu();
 void themPhong();
 void xoaPhong();
 void hienThiPhong();
+void suaPhong();
 
 void ngthueMenu();
 void themNguoiThue();
 void xoaNguoiThue();
 void hienThiNguoiThue();
+void suaNguoiThue();
+int demSoNguoiTrongPhong(string maPhong);
+string nhapDong();
+bool kiemTraHoTen(string ten);
+bool kiemTraSoDienThoai(string sdt);
 
 void hoadon();
 void hienThiHoaDon();
 void xuatHoaDon();
+void capNhatThanhToan();
 
 void searchMenu();
 void timPhong();
 void timNguoiThue();
 void timHoaDon();
 
-void sapxepMenu();
-void sapXepPhong();
-void sapXepHoaDon();
-
 void thongkeMenu();
 void thongKePhong();
 void thongKeNguoiThue();
 void thongKeHoaDon();
+void thongKeChuaThanhToan();
+
+void sapxepMenu();
+void sapXepPhong();
+void sapXepHoaDon();
+void sapXepHoaDonTheoThang();
+void sapXepNguoiThue();
 
 int main()
 {
