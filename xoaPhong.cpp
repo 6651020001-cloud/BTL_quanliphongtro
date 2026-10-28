@@ -16,6 +16,16 @@ void xoaPhong()
         }
     }
 
+    // khong cho xoa phong con hoa don chua thu tien
+    for(int i = 0; i < (int)danhSachHoaDon.size(); i++)
+    {
+        if(danhSachHoaDon[i].maPhong == ma && danhSachHoaDon[i].daThanhToan == false)
+        {
+            cout << "Phong con hoa don chua thanh toan, khong the xoa!\n";
+            return;
+        }
+    }
+
     for(int i = 0; i < (int)danhSachPhong.size(); i++)
     {
         if(danhSachPhong[i].maPhong == ma)
