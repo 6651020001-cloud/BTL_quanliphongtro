@@ -10,6 +10,7 @@ void sapxepMenu()
     {
         cout << "\n============= SAP XEP =============\n";
         cout << "1. Sap xep phong theo gia\n";
+        cout << "2. Sap xep hoa don theo tong tien\n";
         cout << "0. Quay lai\n";
         cout << "===================================\n";
         cout << "Nhap lua chon: ";
@@ -19,6 +20,9 @@ void sapxepMenu()
         {
             case 1:
                 sapXepPhong();
+                break;
+            case 2:
+                sapXepHoaDon();
                 break;
             case 0:
                 break;
@@ -134,4 +138,58 @@ void sapXepPhong()
     cout << "So lan so sanh: " << soSoSanh << endl;
     cout << "So lan di chuyen/doi cho: " << soDiChuyen << endl;
     hienThiPhong();
+}
+
+void sapXepHoaDon()
+{
+    if(danhSachHoaDon.empty())
+    {
+        cout << "Danh sach hoa don dang rong!\n";
+        return;
+    }
+
+    int kieu;
+    cout << "\n1. Tong tien tang dan\n";
+    cout << "2. Tong tien giam dan\n";
+    cout << "0. Huy\n";
+    cout << "Nhap lua chon: ";
+    kieu = nhapSoNguyen();
+    while(kieu < 0 || kieu > 2)
+    {
+        cout << "Lua chon khong hop le, nhap lai: ";
+        kieu = nhapSoNguyen();
+    }
+
+    if(kieu == 0)
+        return;
+
+    // insertion sort
+    for(int i = 1; i < (int)danhSachHoaDon.size(); i++)
+    {
+        HoaDon x = danhSachHoaDon[i];
+        int j = i - 1;
+
+        if(kieu == 1)
+        {
+            while(j >= 0 && danhSachHoaDon[j].tongTien > x.tongTien)
+            {
+                danhSachHoaDon[j + 1] = danhSachHoaDon[j];
+                j--;
+            }
+        }
+        else
+        {
+            while(j >= 0 && danhSachHoaDon[j].tongTien < x.tongTien)
+            {
+                danhSachHoaDon[j + 1] = danhSachHoaDon[j];
+                j--;
+            }
+        }
+
+        danhSachHoaDon[j + 1] = x;
+    }
+
+    luuDuLieu();
+    cout << "\nDa sap xep hoa don thanh cong!\n";
+    hienThiHoaDon();
 }
