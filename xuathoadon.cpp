@@ -20,6 +20,7 @@ void xuatHoaDon()
     cin >> hd.maPhong;
 
     bool coPhong = false;
+    bool phongTrong = false;
 
     for(int i = 0; i < (int)danhSachPhong.size(); i++)
     {
@@ -27,6 +28,7 @@ void xuatHoaDon()
         {
             hd.tienPhong = danhSachPhong[i].giaPhong;
             coPhong = true;
+            phongTrong = (danhSachPhong[i].trangThai == "Trong");
             break;
         }
     }
@@ -34,6 +36,13 @@ void xuatHoaDon()
     if(coPhong == false)
     {
         cout << "Khong tim thay phong!\n";
+        return;
+    }
+
+    // phong khong co ai o thi khong thu tien
+    if(phongTrong)
+    {
+        cout << "Phong dang trong, khong the xuat hoa don!\n";
         return;
     }
 
@@ -67,11 +76,49 @@ void xuatHoaDon()
         }
     }
 
-    cout << "Nhap tien dien: ";
-    hd.tienDien = nhapSoTien();
+    // tien dien = (chi so moi - chi so cu) * don gia
+    int dienCu, dienMoi;
+    cout << "Nhap chi so dien thang truoc: ";
+    dienCu = nhapSoNguyen();
+    while(dienCu < 0)
+    {
+        cout << "Chi so khong hop le, nhap lai: ";
+        dienCu = nhapSoNguyen();
+    }
 
-    cout << "Nhap tien nuoc: ";
-    hd.tienNuoc = nhapSoTien();
+    cout << "Nhap chi so dien thang nay: ";
+    dienMoi = nhapSoNguyen();
+    while(dienMoi < dienCu)
+    {
+        cout << "Chi so moi phai lon hon hoac bang chi so cu, nhap lai: ";
+        dienMoi = nhapSoNguyen();
+    }
+
+    hd.tienDien = (dienMoi - dienCu) * GIA_DIEN;
+    cout << "So dien da dung: " << dienMoi - dienCu << " kWh -> "
+         << hd.tienDien << " VND\n";
+
+    // tien nuoc tinh tuong tu tien dien
+    int nuocCu, nuocMoi;
+    cout << "Nhap chi so nuoc thang truoc: ";
+    nuocCu = nhapSoNguyen();
+    while(nuocCu < 0)
+    {
+        cout << "Chi so khong hop le, nhap lai: ";
+        nuocCu = nhapSoNguyen();
+    }
+
+    cout << "Nhap chi so nuoc thang nay: ";
+    nuocMoi = nhapSoNguyen();
+    while(nuocMoi < nuocCu)
+    {
+        cout << "Chi so moi phai lon hon hoac bang chi so cu, nhap lai: ";
+        nuocMoi = nhapSoNguyen();
+    }
+
+    hd.tienNuoc = (nuocMoi - nuocCu) * GIA_NUOC;
+    cout << "So nuoc da dung: " << nuocMoi - nuocCu << " m3 -> "
+         << hd.tienNuoc << " VND\n";
 
     cout << "Nhap tien khac: ";
     hd.tienKhac = nhapSoTien();
@@ -96,5 +143,3 @@ void xuatHoaDon()
     cout << "Xuat hoa don thanh cong!\n";
     cout << "Tong tien: " << hd.tongTien << " VND\n";
 }
-
-// ================= TIM KIEM =================
