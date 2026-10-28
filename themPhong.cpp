@@ -18,6 +18,11 @@ void themPhong()
 
     cout << "Nhap gia phong: ";
     p.giaPhong = nhapSoTien();
+    while(p.giaPhong <= 0)
+    {
+        cout << "Gia phong phai lon hon 0, nhap lai: ";
+        p.giaPhong = nhapSoTien();
+    }
 
     p.trangThai = "Trong";
     danhSachPhong.push_back(p);
