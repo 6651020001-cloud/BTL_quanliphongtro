@@ -1,4 +1,3 @@
-// ================= TIM KIEM =================
 void searchMenu()
 {
     int luaChon;
