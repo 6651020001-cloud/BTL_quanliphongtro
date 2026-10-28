@@ -10,7 +10,6 @@ void thongKePhong()
         else
             phongDaThue++;
     }
-
     cout << "\n=========== THONG KE PHONG ===========\n";
     cout << "Tong so phong: " << danhSachPhong.size() << endl;
     cout << "So phong trong: " << phongTrong << endl;
