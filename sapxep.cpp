@@ -12,6 +12,7 @@ void sapxepMenu()
         cout << "1. Sap xep phong theo gia\n";
         cout << "2. Sap xep hoa don theo tong tien\n";
         cout << "3. Sap xep hoa don theo thang/nam\n";
+        cout << "4. Sap xep nguoi thue theo ma phong\n";
         cout << "0. Quay lai\n";
         cout << "===================================\n";
         cout << "Nhap lua chon: ";
@@ -27,6 +28,9 @@ void sapxepMenu()
                 break;
             case 3:
                 sapXepHoaDonTheoThang();
+                break;
+            case 4:
+                sapXepNguoiThue();
                 break;
             case 0:
                 break;
@@ -227,4 +231,33 @@ void sapXepHoaDonTheoThang()
     luuDuLieu();
     cout << "\nDa sap xep hoa don theo thang/nam!\n";
     hienThiHoaDon();
+}
+
+// sap xep nguoi thue theo ma phong de nhung nguoi cung phong dung canh nhau
+void sapXepNguoiThue()
+{
+    if(danhSachNguoiThue.empty())
+    {
+        cout << "Danh sach nguoi thue dang rong!\n";
+        return;
+    }
+
+    // insertion sort, so sanh chuoi theo thu tu tu dien
+    for(int i = 1; i < (int)danhSachNguoiThue.size(); i++)
+    {
+        NguoiThue x = danhSachNguoiThue[i];
+        int j = i - 1;
+
+        while(j >= 0 && danhSachNguoiThue[j].maPhong > x.maPhong)
+        {
+            danhSachNguoiThue[j + 1] = danhSachNguoiThue[j];
+            j--;
+        }
+
+        danhSachNguoiThue[j + 1] = x;
+    }
+
+    luuDuLieu();
+    cout << "\nDa sap xep nguoi thue theo ma phong!\n";
+    hienThiNguoiThue();
 }
