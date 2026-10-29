@@ -44,38 +44,57 @@ struct HoaDon
     bool daThanhToan;
 };
 
+// cac danh sach dung chung cho ca chuong trinh
 vector<Phong> danhSachPhong;
 vector<NguoiThue> danhSachNguoiThue;
 vector<HoaDon> danhSachHoaDon;
 
-// khai bao ham
+// ================= KHAI BAO HAM =================
+
+void xoaLoiNhap();
+int nhapSoNguyen();
+double nhapSoTien();
+void luuDuLieu();
+void docDuLieu();
+
 void phongMenu();
 void themPhong();
 void xoaPhong();
 void hienThiPhong();
+void suaPhong();
 
 void ngthueMenu();
 void themNguoiThue();
 void xoaNguoiThue();
 void hienThiNguoiThue();
+void suaNguoiThue();
+int demSoNguoiTrongPhong(string maPhong);
+string nhapDong();
+bool kiemTraHoTen(string ten);
+bool kiemTraSoDienThoai(string sdt);
 
 void hoadon();
 void hienThiHoaDon();
 void xuatHoaDon();
+void capNhatThanhToan();
 
 void searchMenu();
 void timPhong();
 void timNguoiThue();
 void timHoaDon();
 
-void sapxepMenu();
-void sapXepPhong();
-void sapXepHoaDon();
-
 void thongkeMenu();
 void thongKePhong();
 void thongKeNguoiThue();
 void thongKeHoaDon();
+void thongKeChuaThanhToan();
+
+void sapxepMenu();
+void sapXepPhong();
+void sapXepHoaDon();
+void sapXepHoaDonTheoThang();
+void sapXepNguoiThue();
+
 
 // ================= NHAP DU LIEU =================
 
@@ -261,8 +280,7 @@ void docDuLieu()
         cout << "Canh bao: bo qua " << soDongLoi << " dong du lieu bi loi!\n";
 }
 
-
-// ================= QUAN LY PHONG =================
+// NGUOI 1 phu trach: QUAN LY PHONG (them, xoa, sua gia, hien thi phong)
 
 void phongMenu()
 {
@@ -274,6 +292,7 @@ void phongMenu()
         cout << "1. Them phong\n";
         cout << "2. Xoa phong\n";
         cout << "3. Hien thi danh sach phong\n";
+        cout << "4. Sua gia phong\n";
         cout << "0. Quay lai\n";
         cout << "===================================\n";
         cout << "Nhap lua chon: ";
@@ -289,6 +308,9 @@ void phongMenu()
                 break;
             case 3:
                 hienThiPhong();
+                break;
+            case 4:
+                suaPhong();
                 break;
             case 0:
                 break;
@@ -318,6 +340,11 @@ void themPhong()
 
     cout << "Nhap gia phong: ";
     p.giaPhong = nhapSoTien();
+    while(p.giaPhong <= 0)
+    {
+        cout << "Gia phong phai lon hon 0, nhap lai: ";
+        p.giaPhong = nhapSoTien();
+    }
 
     p.trangThai = "Trong";
     danhSachPhong.push_back(p);
@@ -344,6 +371,16 @@ void xoaPhong()
         }
     }
 
+    // khong cho xoa phong con hoa don chua thu tien
+    for(int i = 0; i < (int)danhSachHoaDon.size(); i++)
+    {
+        if(danhSachHoaDon[i].maPhong == ma && danhSachHoaDon[i].daThanhToan == false)
+        {
+            cout << "Phong con hoa don chua thanh toan, khong the xoa!\n";
+            return;
+        }
+    }
+
     for(int i = 0; i < (int)danhSachPhong.size(); i++)
     {
         if(danhSachPhong[i].maPhong == ma)
@@ -351,6 +388,37 @@ void xoaPhong()
             danhSachPhong.erase(danhSachPhong.begin() + i);
             luuDuLieu();
             cout << "Xoa phong thanh cong!\n";
+            return;
+        }
+    }
+
+    cout << "Khong tim thay phong!\n";
+}
+
+void suaPhong()
+{
+    string ma;
+
+    cout << "\n===== SUA GIA PHONG =====\n";
+    cout << "Nhap ma phong can sua: ";
+    cin >> ma;
+
+    for(int i = 0; i < (int)danhSachPhong.size(); i++)
+    {
+        if(danhSachPhong[i].maPhong == ma)
+        {
+            cout << "Gia hien tai: " << danhSachPhong[i].giaPhong << " VND\n";
+            cout << "Nhap gia moi: ";
+            danhSachPhong[i].giaPhong = nhapSoTien();
+            while(danhSachPhong[i].giaPhong <= 0)
+            {
+                cout << "Gia phong phai lon hon 0, nhap lai: ";
+                danhSachPhong[i].giaPhong = nhapSoTien();
+            }
+
+            // hoa don da xuat truoc do van giu gia cu, chi hoa don moi dung gia moi
+            luuDuLieu();
+            cout << "Sua gia phong thanh cong!\n";
             return;
         }
     }
@@ -374,11 +442,70 @@ void hienThiPhong()
         cout << "Ma phong: " << danhSachPhong[i].maPhong << endl;
         cout << "Gia phong: " << danhSachPhong[i].giaPhong << " VND" << endl;
         cout << "Trang thai: " << danhSachPhong[i].trangThai << endl;
+        cout << "So nguoi dang o: " << demSoNguoiTrongPhong(danhSachPhong[i].maPhong) << endl;
         cout << "---------------------------\n";
     }
 }
 
-// ================= QUAN LY NGUOI THUE =================
+// NGUOI 2 phu trach: QUAN LY NGUOI THUE (them, xoa, sua, hien thi nguoi thue)
+
+// 1 phong o toi da 4 nguoi
+const int SO_NGUOI_TOI_DA = 4;
+
+// dem so nguoi dang o trong 1 phong
+int demSoNguoiTrongPhong(string maPhong)
+{
+    int dem = 0;
+
+    for(int i = 0; i < (int)danhSachNguoiThue.size(); i++)
+    {
+        if(danhSachNguoiThue[i].maPhong == maPhong)
+            dem++;
+    }
+
+    return dem;
+}
+
+// doc ca 1 dong (ho ten co dau cach), het du lieu dau vao thi thoat
+string nhapDong()
+{
+    string s;
+
+    if(!getline(cin, s))
+        xoaLoiNhap();
+
+    return s;
+}
+
+// ho ten khong duoc de trong va khong chua dau '|' (file dung '|' de ngan cach)
+bool kiemTraHoTen(string ten)
+{
+    if(ten == "")
+        return false;
+
+    for(int i = 0; i < (int)ten.size(); i++)
+    {
+        if(ten[i] == '|')
+            return false;
+    }
+
+    return true;
+}
+
+// so dien thoai phai co 10 chu so va bat dau bang so 0
+bool kiemTraSoDienThoai(string sdt)
+{
+    if(sdt.size() != 10 || sdt[0] != '0')
+        return false;
+
+    for(int i = 0; i < (int)sdt.size(); i++)
+    {
+        if(sdt[i] < '0' || sdt[i] > '9')
+            return false;
+    }
+
+    return true;
+}
 
 void ngthueMenu()
 {
@@ -390,6 +517,7 @@ void ngthueMenu()
         cout << "1. Them nguoi thue\n";
         cout << "2. Xoa nguoi thue\n";
         cout << "3. Hien thi danh sach\n";
+        cout << "4. Sua thong tin nguoi thue\n";
         cout << "0. Quay lai\n";
         cout << "==================================\n";
         cout << "Nhap lua chon: ";
@@ -405,6 +533,9 @@ void ngthueMenu()
                 break;
             case 3:
                 hienThiNguoiThue();
+                break;
+            case 4:
+                suaNguoiThue();
                 break;
             case 0:
                 break;
@@ -452,18 +583,31 @@ void themNguoiThue()
         return;
     }
 
-    if(danhSachPhong[viTri].trangThai == "Da thue")
+    // 1 phong o duoc nhieu nguoi nhung khong qua SO_NGUOI_TOI_DA
+    if(demSoNguoiTrongPhong(nguoi.maPhong) >= SO_NGUOI_TOI_DA)
     {
-        cout << "Phong nay da co nguoi thue!\n";
+        cout << "Phong nay da du " << SO_NGUOI_TOI_DA << " nguoi!\n";
         return;
     }
 
-    cin.ignore();
+    // bo het phan con lai cua dong truoc khi dung getline
+    cin.ignore(1000, '\n');
+
     cout << "Nhap ho ten: ";
-    getline(cin, nguoi.hoTen);
+    nguoi.hoTen = nhapDong();
+    while(!kiemTraHoTen(nguoi.hoTen))
+    {
+        cout << "Ho ten khong hop le, nhap lai: ";
+        nguoi.hoTen = nhapDong();
+    }
 
     cout << "Nhap so dien thoai: ";
-    getline(cin, nguoi.soDienThoai);
+    nguoi.soDienThoai = nhapDong();
+    while(!kiemTraSoDienThoai(nguoi.soDienThoai))
+    {
+        cout << "So dien thoai phai gom 10 chu so, bat dau bang 0. Nhap lai: ";
+        nguoi.soDienThoai = nhapDong();
+    }
 
     danhSachNguoiThue.push_back(nguoi);
     danhSachPhong[viTri].trangThai = "Da thue";
@@ -518,6 +662,67 @@ void xoaNguoiThue()
     cout << "Khong tim thay nguoi thue!\n";
 }
 
+void suaNguoiThue()
+{
+    string ma;
+
+    cout << "\n===== SUA THONG TIN NGUOI THUE =====\n";
+    cout << "Nhap ma nguoi thue can sua: ";
+    cin >> ma;
+
+    for(int i = 0; i < (int)danhSachNguoiThue.size(); i++)
+    {
+        if(danhSachNguoiThue[i].maNguoi == ma)
+        {
+            cout << "Ho ten: " << danhSachNguoiThue[i].hoTen << endl;
+            cout << "So dien thoai: " << danhSachNguoiThue[i].soDienThoai << endl;
+            cout << "1. Sua ho ten\n";
+            cout << "2. Sua so dien thoai\n";
+            cout << "0. Huy\n";
+            cout << "Nhap lua chon: ";
+
+            int chon = nhapSoNguyen();
+            cin.ignore(1000, '\n');
+
+            if(chon == 1)
+            {
+                string tenMoi;
+                cout << "Nhap ho ten moi: ";
+                tenMoi = nhapDong();
+                while(!kiemTraHoTen(tenMoi))
+                {
+                    cout << "Ho ten khong hop le, nhap lai: ";
+                    tenMoi = nhapDong();
+                }
+                danhSachNguoiThue[i].hoTen = tenMoi;
+            }
+            else if(chon == 2)
+            {
+                string sdtMoi;
+                cout << "Nhap so dien thoai moi: ";
+                sdtMoi = nhapDong();
+                while(!kiemTraSoDienThoai(sdtMoi))
+                {
+                    cout << "So dien thoai phai gom 10 chu so, bat dau bang 0. Nhap lai: ";
+                    sdtMoi = nhapDong();
+                }
+                danhSachNguoiThue[i].soDienThoai = sdtMoi;
+            }
+            else
+            {
+                cout << "Da huy sua!\n";
+                return;
+            }
+
+            luuDuLieu();
+            cout << "Sua thong tin thanh cong!\n";
+            return;
+        }
+    }
+
+    cout << "Khong tim thay nguoi thue!\n";
+}
+
 void hienThiNguoiThue()
 {
     if(danhSachNguoiThue.empty())
@@ -539,7 +744,11 @@ void hienThiNguoiThue()
     }
 }
 
-// ================= QUAN LY HOA DON =================
+// NGUOI 3 phu trach: QUAN LY HOA DON (xuat, hien thi, cap nhat thanh toan)
+
+// don gia dien nuoc (VND)
+const double GIA_DIEN = 3500;    // 1 kWh
+const double GIA_NUOC = 20000;   // 1 m3
 
 void hoadon()
 {
@@ -550,6 +759,7 @@ void hoadon()
         cout << "\n========== QUAN LY HOA DON ==========\n";
         cout << "1. Hien thi hoa don\n";
         cout << "2. Xuat hoa don\n";
+        cout << "3. Cap nhat thanh toan\n";
         cout << "0. Quay lai\n";
         cout << "=====================================\n";
         cout << "Nhap lua chon: ";
@@ -562,6 +772,9 @@ void hoadon()
                 break;
             case 2:
                 xuatHoaDon();
+                break;
+            case 3:
+                capNhatThanhToan();
                 break;
             case 0:
                 break;
@@ -625,6 +838,7 @@ void xuatHoaDon()
     cin >> hd.maPhong;
 
     bool coPhong = false;
+    bool phongTrong = false;
 
     for(int i = 0; i < (int)danhSachPhong.size(); i++)
     {
@@ -632,6 +846,7 @@ void xuatHoaDon()
         {
             hd.tienPhong = danhSachPhong[i].giaPhong;
             coPhong = true;
+            phongTrong = (danhSachPhong[i].trangThai == "Trong");
             break;
         }
     }
@@ -639,6 +854,13 @@ void xuatHoaDon()
     if(coPhong == false)
     {
         cout << "Khong tim thay phong!\n";
+        return;
+    }
+
+    // phong khong co ai o thi khong thu tien
+    if(phongTrong)
+    {
+        cout << "Phong dang trong, khong the xuat hoa don!\n";
         return;
     }
 
@@ -672,11 +894,49 @@ void xuatHoaDon()
         }
     }
 
-    cout << "Nhap tien dien: ";
-    hd.tienDien = nhapSoTien();
+    // tien dien = (chi so moi - chi so cu) * don gia
+    int dienCu, dienMoi;
+    cout << "Nhap chi so dien thang truoc: ";
+    dienCu = nhapSoNguyen();
+    while(dienCu < 0)
+    {
+        cout << "Chi so khong hop le, nhap lai: ";
+        dienCu = nhapSoNguyen();
+    }
 
-    cout << "Nhap tien nuoc: ";
-    hd.tienNuoc = nhapSoTien();
+    cout << "Nhap chi so dien thang nay: ";
+    dienMoi = nhapSoNguyen();
+    while(dienMoi < dienCu)
+    {
+        cout << "Chi so moi phai lon hon hoac bang chi so cu, nhap lai: ";
+        dienMoi = nhapSoNguyen();
+    }
+
+    hd.tienDien = (dienMoi - dienCu) * GIA_DIEN;
+    cout << "So dien da dung: " << dienMoi - dienCu << " kWh -> "
+         << hd.tienDien << " VND\n";
+
+    // tien nuoc tinh tuong tu tien dien
+    int nuocCu, nuocMoi;
+    cout << "Nhap chi so nuoc thang truoc: ";
+    nuocCu = nhapSoNguyen();
+    while(nuocCu < 0)
+    {
+        cout << "Chi so khong hop le, nhap lai: ";
+        nuocCu = nhapSoNguyen();
+    }
+
+    cout << "Nhap chi so nuoc thang nay: ";
+    nuocMoi = nhapSoNguyen();
+    while(nuocMoi < nuocCu)
+    {
+        cout << "Chi so moi phai lon hon hoac bang chi so cu, nhap lai: ";
+        nuocMoi = nhapSoNguyen();
+    }
+
+    hd.tienNuoc = (nuocMoi - nuocCu) * GIA_NUOC;
+    cout << "So nuoc da dung: " << nuocMoi - nuocCu << " m3 -> "
+         << hd.tienNuoc << " VND\n";
 
     cout << "Nhap tien khac: ";
     hd.tienKhac = nhapSoTien();
@@ -701,6 +961,50 @@ void xuatHoaDon()
     cout << "Xuat hoa don thanh cong!\n";
     cout << "Tong tien: " << hd.tongTien << " VND\n";
 }
+
+// khi nguoi thue dong tien thi chuyen hoa don sang da thanh toan
+void capNhatThanhToan()
+{
+    string ma;
+
+    cout << "\n===== CAP NHAT THANH TOAN =====\n";
+    cout << "Nhap ma hoa don: ";
+    cin >> ma;
+
+    for(int i = 0; i < (int)danhSachHoaDon.size(); i++)
+    {
+        if(danhSachHoaDon[i].maHoaDon == ma)
+        {
+            if(danhSachHoaDon[i].daThanhToan)
+            {
+                cout << "Hoa don nay da thanh toan roi!\n";
+                return;
+            }
+
+            cout << "Phong " << danhSachHoaDon[i].maPhong << " - thang "
+                 << danhSachHoaDon[i].thang << "/" << danhSachHoaDon[i].nam << endl;
+            cout << "So tien can thu: " << danhSachHoaDon[i].tongTien << " VND\n";
+            cout << "Xac nhan da thu tien? (1: Co, 0: Khong): ";
+
+            int xacNhan = nhapSoNguyen();
+            if(xacNhan != 1)
+            {
+                cout << "Da huy cap nhat!\n";
+                return;
+            }
+
+            danhSachHoaDon[i].daThanhToan = true;
+            luuDuLieu();
+
+            cout << "Cap nhat thanh toan thanh cong!\n";
+            return;
+        }
+    }
+
+    cout << "Khong tim thay hoa don!\n";
+}
+
+// NGUOI 4 phu trach: TIM KIEM + THONG KE
 
 // ================= TIM KIEM =================
 
@@ -753,6 +1057,7 @@ void timPhong()
             cout << "Ma phong: " << danhSachPhong[i].maPhong << endl;
             cout << "Gia phong: " << danhSachPhong[i].giaPhong << " VND" << endl;
             cout << "Trang thai: " << danhSachPhong[i].trangThai << endl;
+            cout << "So nguoi dang o: " << demSoNguoiTrongPhong(danhSachPhong[i].maPhong) << endl;
             return;
         }
     }
@@ -813,145 +1118,6 @@ void timHoaDon()
     cout << "Khong tim thay hoa don!\n";
 }
 
-// ================= SAP XEP =================
-
-void sapxepMenu()
-{
-    int luaChon;
-
-    do
-    {
-        cout << "\n============= SAP XEP =============\n";
-        cout << "1. Sap xep phong theo gia\n";
-        cout << "2. Sap xep hoa don theo tong tien\n";
-        cout << "0. Quay lai\n";
-        cout << "===================================\n";
-        cout << "Nhap lua chon: ";
-        luaChon = nhapSoNguyen();
-
-        switch(luaChon)
-        {
-            case 1:
-                sapXepPhong();
-                break;
-            case 2:
-                sapXepHoaDon();
-                break;
-            case 0:
-                break;
-            default:
-                cout << "Lua chon khong hop le!\n";
-        }
-    }while(luaChon != 0);
-}
-
-void sapXepPhong()
-{
-    if(danhSachPhong.empty())
-    {
-        cout << "Danh sach phong dang rong!\n";
-        return;
-    }
-
-    int kieu;
-    cout << "\n1. Gia tang dan\n";
-    cout << "2. Gia giam dan\n";
-    cout << "0. Huy\n";
-    cout << "Nhap lua chon: ";
-    kieu = nhapSoNguyen();
-
-    if(kieu == 0)
-        return;
-
-    // insertion sort
-    for(int i = 1; i < (int)danhSachPhong.size(); i++)
-    {
-        Phong x = danhSachPhong[i];
-        int j = i - 1;
-
-        if(kieu == 1)
-        {
-            while(j >= 0 && danhSachPhong[j].giaPhong > x.giaPhong)
-            {
-                danhSachPhong[j + 1] = danhSachPhong[j];
-                j--;
-            }
-        }
-        else if(kieu == 2)
-        {
-            while(j >= 0 && danhSachPhong[j].giaPhong < x.giaPhong)
-            {
-                danhSachPhong[j + 1] = danhSachPhong[j];
-                j--;
-            }
-        }
-        else
-        {
-            cout << "Lua chon khong hop le!\n";
-            return;
-        }
-
-        danhSachPhong[j + 1] = x;
-    }
-
-    luuDuLieu();
-    cout << "\nDa sap xep phong thanh cong!\n";
-    hienThiPhong();
-}
-
-void sapXepHoaDon()
-{
-    if(danhSachHoaDon.empty())
-    {
-        cout << "Danh sach hoa don dang rong!\n";
-        return;
-    }
-
-    int kieu;
-    cout << "\n1. Tong tien tang dan\n";
-    cout << "2. Tong tien giam dan\n";
-    cout << "0. Huy\n";
-    cout << "Nhap lua chon: ";
-    kieu = nhapSoNguyen();
-
-    if(kieu == 0)
-        return;
-
-    // insertion sort
-    for(int i = 1; i < (int)danhSachHoaDon.size(); i++)
-    {
-        HoaDon x = danhSachHoaDon[i];
-        int j = i - 1;
-
-        if(kieu == 1)
-        {
-            while(j >= 0 && danhSachHoaDon[j].tongTien > x.tongTien)
-            {
-                danhSachHoaDon[j + 1] = danhSachHoaDon[j];
-                j--;
-            }
-        }
-        else if(kieu == 2)
-        {
-            while(j >= 0 && danhSachHoaDon[j].tongTien < x.tongTien)
-            {
-                danhSachHoaDon[j + 1] = danhSachHoaDon[j];
-                j--;
-            }
-        }
-        else
-        {
-            cout << "Lua chon khong hop le!\n";
-            return;
-        }
-
-        danhSachHoaDon[j + 1] = x;
-    }
-
-    luuDuLieu();
-    cout << "\nDa sap xep hoa don thanh cong!\n";
-    hienThiHoaDon();
-}
 
 // ================= THONG KE =================
 
@@ -965,6 +1131,7 @@ void thongkeMenu()
         cout << "1. Thong ke phong\n";
         cout << "2. Thong ke nguoi thue\n";
         cout << "3. Thong ke hoa don\n";
+        cout << "4. Danh sach hoa don chua thanh toan\n";
         cout << "0. Quay lai\n";
         cout << "====================================\n";
         cout << "Nhap lua chon: ";
@@ -980,6 +1147,9 @@ void thongkeMenu()
                 break;
             case 3:
                 thongKeHoaDon();
+                break;
+            case 4:
+                thongKeChuaThanhToan();
                 break;
             case 0:
                 break;
@@ -1046,6 +1216,308 @@ void thongKeHoaDon()
     cout << "Tong tien con no: " << tongNo << " VND" << endl;
     cout << "======================================\n";
 }
+
+// liet ke cac hoa don chua thanh toan de chu tro biet phong nao con no
+void thongKeChuaThanhToan()
+{
+    int dem = 0;
+    double tongNo = 0;
+
+    cout << "\n====== HOA DON CHUA THANH TOAN ======\n";
+
+    if(danhSachHoaDon.empty())
+    {
+        cout << "Chua co hoa don nao!\n";
+        return;
+    }
+
+    for(int i = 0; i < (int)danhSachHoaDon.size(); i++)
+    {
+        if(danhSachHoaDon[i].daThanhToan == false)
+        {
+            dem++;
+            tongNo += danhSachHoaDon[i].tongTien;
+
+            cout << dem << ". " << danhSachHoaDon[i].maHoaDon
+                 << " - Phong " << danhSachHoaDon[i].maPhong
+                 << " - Thang " << danhSachHoaDon[i].thang << "/" << danhSachHoaDon[i].nam
+                 << ": " << danhSachHoaDon[i].tongTien << " VND\n";
+        }
+    }
+
+    if(dem == 0)
+        cout << "Tat ca hoa don da duoc thanh toan!\n";
+    else
+        cout << "Tong cong: " << dem << " hoa don, " << tongNo << " VND\n";
+
+    cout << "=====================================\n";
+}
+
+// NGUOI 5 phu trach: SAP XEP (insertion sort, selection sort) + phan DSA
+
+// ================= SAP XEP =================
+
+void sapxepMenu()
+{
+    int luaChon;
+
+    do
+    {
+        cout << "\n============= SAP XEP =============\n";
+        cout << "1. Sap xep phong theo gia\n";
+        cout << "2. Sap xep hoa don theo tong tien\n";
+        cout << "3. Sap xep hoa don theo thang/nam\n";
+        cout << "4. Sap xep nguoi thue theo ma phong\n";
+        cout << "0. Quay lai\n";
+        cout << "===================================\n";
+        cout << "Nhap lua chon: ";
+        luaChon = nhapSoNguyen();
+
+        switch(luaChon)
+        {
+            case 1:
+                sapXepPhong();
+                break;
+            case 2:
+                sapXepHoaDon();
+                break;
+            case 3:
+                sapXepHoaDonTheoThang();
+                break;
+            case 4:
+                sapXepNguoiThue();
+                break;
+            case 0:
+                break;
+            default:
+                cout << "Lua chon khong hop le!\n";
+        }
+    }while(luaChon != 0);
+}
+
+// a dung truoc b ma sai thu tu thi tra ve true
+bool saiThuTu(double a, double b, bool tangDan)
+{
+    if(tangDan)
+        return a > b;
+    return a < b;
+}
+
+// insertion sort: lay tung phong chen vao dung vi tri trong doan da sap xep
+// soSoSanh, soDiChuyen de dem so buoc, dung de so sanh 2 thuat toan
+void insertionSortPhong(bool tangDan, int &soSoSanh, int &soDiChuyen)
+{
+    for(int i = 1; i < (int)danhSachPhong.size(); i++)
+    {
+        Phong x = danhSachPhong[i];
+        int j = i - 1;
+
+        while(j >= 0)
+        {
+            soSoSanh++;
+            if(!saiThuTu(danhSachPhong[j].giaPhong, x.giaPhong, tangDan))
+                break;
+
+            danhSachPhong[j + 1] = danhSachPhong[j];
+            soDiChuyen++;
+            j--;
+        }
+
+        danhSachPhong[j + 1] = x;
+    }
+}
+
+// selection sort: moi luot tim phong re nhat (hoac dat nhat) dua len dau
+void selectionSortPhong(bool tangDan, int &soSoSanh, int &soDiChuyen)
+{
+    int n = danhSachPhong.size();
+
+    for(int i = 0; i < n - 1; i++)
+    {
+        int viTri = i;
+
+        for(int j = i + 1; j < n; j++)
+        {
+            soSoSanh++;
+            if(saiThuTu(danhSachPhong[viTri].giaPhong, danhSachPhong[j].giaPhong, tangDan))
+                viTri = j;
+        }
+
+        if(viTri != i)
+        {
+            Phong tam = danhSachPhong[i];
+            danhSachPhong[i] = danhSachPhong[viTri];
+            danhSachPhong[viTri] = tam;
+            soDiChuyen++;
+        }
+    }
+}
+
+void sapXepPhong()
+{
+    if(danhSachPhong.empty())
+    {
+        cout << "Danh sach phong dang rong!\n";
+        return;
+    }
+
+    int kieu;
+    cout << "\n1. Gia tang dan\n";
+    cout << "2. Gia giam dan\n";
+    cout << "0. Huy\n";
+    cout << "Nhap lua chon: ";
+    kieu = nhapSoNguyen();
+    while(kieu < 0 || kieu > 2)
+    {
+        cout << "Lua chon khong hop le, nhap lai: ";
+        kieu = nhapSoNguyen();
+    }
+
+    if(kieu == 0)
+        return;
+
+    int thuatToan;
+    cout << "\nChon thuat toan:\n";
+    cout << "1. Insertion sort\n";
+    cout << "2. Selection sort\n";
+    cout << "Nhap lua chon: ";
+    thuatToan = nhapSoNguyen();
+    while(thuatToan != 1 && thuatToan != 2)
+    {
+        cout << "Chi nhap 1 hoac 2: ";
+        thuatToan = nhapSoNguyen();
+    }
+
+    int soSoSanh = 0;
+    int soDiChuyen = 0;
+
+    if(thuatToan == 1)
+        insertionSortPhong(kieu == 1, soSoSanh, soDiChuyen);
+    else
+        selectionSortPhong(kieu == 1, soSoSanh, soDiChuyen);
+
+    luuDuLieu();
+    cout << "\nDa sap xep phong thanh cong!\n";
+    cout << "So lan so sanh: " << soSoSanh << endl;
+    cout << "So lan di chuyen/doi cho: " << soDiChuyen << endl;
+    hienThiPhong();
+}
+
+void sapXepHoaDon()
+{
+    if(danhSachHoaDon.empty())
+    {
+        cout << "Danh sach hoa don dang rong!\n";
+        return;
+    }
+
+    int kieu;
+    cout << "\n1. Tong tien tang dan\n";
+    cout << "2. Tong tien giam dan\n";
+    cout << "0. Huy\n";
+    cout << "Nhap lua chon: ";
+    kieu = nhapSoNguyen();
+    while(kieu < 0 || kieu > 2)
+    {
+        cout << "Lua chon khong hop le, nhap lai: ";
+        kieu = nhapSoNguyen();
+    }
+
+    if(kieu == 0)
+        return;
+
+    // insertion sort
+    for(int i = 1; i < (int)danhSachHoaDon.size(); i++)
+    {
+        HoaDon x = danhSachHoaDon[i];
+        int j = i - 1;
+
+        if(kieu == 1)
+        {
+            while(j >= 0 && danhSachHoaDon[j].tongTien > x.tongTien)
+            {
+                danhSachHoaDon[j + 1] = danhSachHoaDon[j];
+                j--;
+            }
+        }
+        else
+        {
+            while(j >= 0 && danhSachHoaDon[j].tongTien < x.tongTien)
+            {
+                danhSachHoaDon[j + 1] = danhSachHoaDon[j];
+                j--;
+            }
+        }
+
+        danhSachHoaDon[j + 1] = x;
+    }
+
+    luuDuLieu();
+    cout << "\nDa sap xep hoa don thanh cong!\n";
+    hienThiHoaDon();
+}
+
+// sap xep hoa don tu cu den moi de xem lich su thu tien
+void sapXepHoaDonTheoThang()
+{
+    if(danhSachHoaDon.empty())
+    {
+        cout << "Danh sach hoa don dang rong!\n";
+        return;
+    }
+
+    // insertion sort, doi thang/nam thanh 1 so cho de so sanh
+    // vi du 10/2026 -> 202610
+    for(int i = 1; i < (int)danhSachHoaDon.size(); i++)
+    {
+        HoaDon x = danhSachHoaDon[i];
+        int giaTriX = x.nam * 100 + x.thang;
+        int j = i - 1;
+
+        while(j >= 0 && danhSachHoaDon[j].nam * 100 + danhSachHoaDon[j].thang > giaTriX)
+        {
+            danhSachHoaDon[j + 1] = danhSachHoaDon[j];
+            j--;
+        }
+
+        danhSachHoaDon[j + 1] = x;
+    }
+
+    luuDuLieu();
+    cout << "\nDa sap xep hoa don theo thang/nam!\n";
+    hienThiHoaDon();
+}
+
+// sap xep nguoi thue theo ma phong de nhung nguoi cung phong dung canh nhau
+void sapXepNguoiThue()
+{
+    if(danhSachNguoiThue.empty())
+    {
+        cout << "Danh sach nguoi thue dang rong!\n";
+        return;
+    }
+
+    // insertion sort, so sanh chuoi theo thu tu tu dien
+    for(int i = 1; i < (int)danhSachNguoiThue.size(); i++)
+    {
+        NguoiThue x = danhSachNguoiThue[i];
+        int j = i - 1;
+
+        while(j >= 0 && danhSachNguoiThue[j].maPhong > x.maPhong)
+        {
+            danhSachNguoiThue[j + 1] = danhSachNguoiThue[j];
+            j--;
+        }
+
+        danhSachNguoiThue[j + 1] = x;
+    }
+
+    luuDuLieu();
+    cout << "\nDa sap xep nguoi thue theo ma phong!\n";
+    hienThiNguoiThue();
+}
+
+// ================= HAM MAIN =================
 
 int main()
 {
