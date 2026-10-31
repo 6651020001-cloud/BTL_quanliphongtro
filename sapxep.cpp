@@ -1,3 +1,6 @@
+// nhom 15 - De Tai: He Thong Quan Ly Phong Tro
+// NGUOI 5 phu trach: SAP XEP (insertion sort, selection sort) + phan DSA
+
 #include "QuanLyPhongTro.h"
 
 // ================= SAP XEP =================
