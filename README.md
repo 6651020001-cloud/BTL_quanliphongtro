@@ -32,7 +32,7 @@ Lớp: CQ.66.KTĐTVT – Khóa 66
 
 | Vai trò | Họ tên | MSSV | Phụ trách | Tệp |
 |---|---|---|---|---|
-| Người 1 | Lương Anh Dũng | 6651020006 | Quản lý phòng | `phong.cpp` |
+| Người 1 | Lương Anh Dũng | 6651020007 | Quản lý phòng | `phong.cpp` |
 | Người 2 | Nguyễn Văn Bản | 6651020001 | Quản lý người thuê | `nguoithue.cpp` |
 | Người 3 | Trần Phát Đạt | 6651020016 | Quản lý hóa đơn | `hoadon.cpp` |
 | Người 4 | Huỳnh Gia Bảo | 6651020002 | Tìm kiếm và thống kê | `timkiem_thongke.cpp` |
